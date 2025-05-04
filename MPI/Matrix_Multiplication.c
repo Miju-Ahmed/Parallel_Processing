@@ -1,3 +1,9 @@
+/*
+    Command for run
+    mpicc -o multiplication Matrix_Multiplication.c
+    mpirun -np 4 ./multiplication
+ */
+
 #include <stdio.h>
 #include <stdlib.h>
 #include <mpi.h>
