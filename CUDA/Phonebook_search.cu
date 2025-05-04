@@ -4,7 +4,7 @@ command ->
 !time ./miju AKHTER 2 > out.txt
 */
 
-%%writefile phonebook_search.cu
+// %%writefile phonebook_search.cu
 #include <bits/stdc++.h>
 using namespace std;
 #include <cuda.h>
@@ -18,13 +18,13 @@ struct Contact{
 string getInput(ifstream& file){
     string ans;
     char c;
-    int readSuru = 0;
+    int insideQuote = 0;
     while(file.get(c)){
         if(c == '\"'){
-            if(readSuru == 1) break;
-            readSuru = 1;
+            if(insideQuote == 1) break;
+            insideQuote = 1;
         }else{
-            if(readSuru){
+            if(insideQuote){
                 ans.push_back(c);
             }
         }
@@ -47,10 +47,20 @@ __device__ bool check(char* str1, char* str2){
 }
 
 
-__global__ void myKernel(Contact* phoneBook, char* pat, int offset){
-    int threadNumber = threadIdx.x + offset;
-    if(check(phoneBook[threadNumber].name, pat)){
-        printf("%s %s\n", phoneBook[threadNumber].name, phoneBook[threadNumber].phone_number);
+// __global__ void myKernel(Contact* phoneBook, char* pat, int offset){
+//     int threadNumber = threadIdx.x + offset;
+//     if(check(phoneBook[threadNumber].name, pat)){
+//         printf("%s %s\n", phoneBook[threadNumber].name, phoneBook[threadNumber].phone_number);
+//     }
+// }
+
+__global__ void FindPhone(Contact* phoneBook, char* pat, int totalSize) {
+    int threadNumber = blockIdx.x * blockDim.x + threadIdx.x;
+
+    if (threadNumber < totalSize) {
+        if (check(phoneBook[threadNumber].name, pat)) {
+            printf("%s %s\n", phoneBook[threadNumber].name, phoneBook[threadNumber].phone_number);
+        }
     }
 }
 
@@ -60,15 +70,15 @@ int main(int argc, char* argv[])
 {
     int threadLimit = atoi(argv[2]);
 
-    ifstream myfile("/content/drive/MyDrive/labtest_dataset1.txt");
+    ifstream myfile("/home/cse/Desktop/Noise_Resilant_Build_Model/MPI/labtest_dataset1.txt");
     vector<Contact> phoneBook;
 
-    int count = 0;
+    // int count = 0;
 
     while(myfile.peek() != EOF){
 
-        if(count > 100000) break;
-        count++;
+        // if(count > 100000) break;
+        // count++;
 
         string name = getInput(myfile);
         string phoneNum = getInput(myfile);
@@ -95,15 +105,22 @@ int main(int argc, char* argv[])
     cudaMemcpy(d_phoneBook, phoneBook.data(), n * sizeof(Contact), cudaMemcpyHostToDevice);
 
 
-    int bakiAche = n;
-    int offset = 0;
-    while(bakiAche > 0){
+    // int bakiAche = n;
+    // int offset = 0;
+    // while(bakiAche > 0){
 
-        int batchSize = min(threadLimit, bakiAche);
-        myKernel<<<1,batchSize>>>(d_phoneBook, d_pat, offset);
-        cudaDeviceSynchronize();
+    //     int batchSize = min(threadLimit, bakiAche);
+    //     myKernel<<<1,batchSize>>>(d_phoneBook, d_pat, offset);
+    //     cudaDeviceSynchronize();
 
-        bakiAche -= batchSize;
-        offset += batchSize;
-    }
+    //     bakiAche -= batchSize;
+    //     offset += batchSize;
+    // }
+
+    int threadsPerBlock = 256;
+    int blocks = (n + threadsPerBlock - 1) / threadsPerBlock;
+
+    FindPhone<<<blocks, threadsPerBlock>>>(d_phoneBook, d_pat, n);
+    cudaDeviceSynchronize();
+
 }
