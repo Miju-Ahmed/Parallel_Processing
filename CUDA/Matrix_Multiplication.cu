@@ -77,6 +77,18 @@ int main(int argc, char *argv[]) {
     //let's copy back to cpu
     cudaMemcpy(h_C, d_C, SizeC * sizeof(float), cudaMemcpyDeviceToHost);
 
+    for (int k = 0; k < K; k++) {
+        cout << "Matrix C[" << k << "] (Result of multiplication " << k + 1 << "):" << endl;
+        for (int i = 0; i < M; i++) {
+            for (int j = 0; j < P; j++) {
+                cout << h_C[k * M * P + i * P + j] << " ";
+            }
+            cout << endl;
+        }
+        cout << endl; // blank line between matrices
+    }
+
+
     cout << "All operation done" << endl;
 
 }
