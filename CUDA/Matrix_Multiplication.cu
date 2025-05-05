@@ -1,4 +1,5 @@
 /*
+https://colab.research.google.com/drive/133N6SMp88vdaE_doLCk_vnBOHUM3seF_?usp=sharing#scrollTo=k1kzz-4upUwX
 command for run 
 nvcc -arch=sm_75 matrix.cu -o miju
 time ./miju 10 50 & sleep 2
