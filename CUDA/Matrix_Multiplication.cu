@@ -1,4 +1,9 @@
-%%writefile asif.cu
+/*
+command for run 
+nvcc -arch=sm_75 matrix.cu -o miju
+time ./miju 10 50 & sleep 2
+*/
+//%%writefile matrix.cu
 #include <iostream>
 #include <cuda_runtime.h>
 using namespace std;
