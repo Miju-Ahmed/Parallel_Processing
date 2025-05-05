@@ -1,4 +1,5 @@
 /*
+https://colab.research.google.com/drive/1MXExWMxIUQVB0JyCUD40FJzE796ksfP9#scrollTo=Ecz-fVBtY5-v
 command -> 
 !nvcc -arch=sm_75 phonebook_search.cu -o miju
 !time ./miju AKHTER 2 > out.txt
